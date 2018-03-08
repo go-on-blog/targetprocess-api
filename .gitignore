@@ -1,0 +1,9 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+*.log
+.DS_Store
+coverage
+doc
+node_modules
+Thumbs.db
+*.sublime-workspace
+*.sublime-project

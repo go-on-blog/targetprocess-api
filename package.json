@@ -1,0 +1,30 @@
+{
+  "name": "tp-api-wrapper",
+  "version": "0.0.1",
+  "description": "Targetprocess REST API wrapper",
+  "author": "Guillaume Oriol <guillaume@go-on.blog>",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "scripts": {
+    "lint": "jslint --edition=es6 --fudge \"src/**/*.js\"",
+    "lint:test": "jslint --edition=es6 --fudge \"test/**/*.js\"",
+    "test": "mocha test --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket:guillaume_oriol/targetprocess.git"
+  },
+  "dependencies": {
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5"
+  },
+  "devDependencies": {
+    "chai": "latest",
+    "chai-as-promised": "latest",
+    "jslint": "latest",
+    "mocha": "latest"
+  },
+  "keywords": [
+    "targetprocess"
+  ]
+}
