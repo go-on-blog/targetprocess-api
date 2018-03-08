@@ -6,8 +6,8 @@
   "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
-    "lint": "jslint --edition=es6 --fudge \"src/**/*.js\"",
-    "lint:test": "jslint --edition=es6 --fudge \"test/**/*.js\"",
+    "lint": "jslint --edition=latest --fudge \"src/**/*.js\"",
+    "lint:test": "jslint --edition=latest --fudge \"test/**/*.js\"",
     "test": "mocha test --recursive"
   },
   "repository": {
