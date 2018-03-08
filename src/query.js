@@ -10,12 +10,35 @@
             json: true,
             headers: {Authorization: `Basic ${token}`}
         };
+        // See https://md5.tpondemand.com/api/v1/index/meta
+        const resources = [
+            "Assignables",
+            "Bugs",
+            "Epics",
+            "Features",
+            "Generals",
+            "Projects",
+            "ProjectMembers",
+            "Requesters",
+            "Tasks",
+            "Users",
+            "UserStories"
+        ];
 
         function normalize(response) {
             return response.Items;
         }
 
+        function isResource(name) {
+            return resources.includes(name);
+        }
+
         function get(entity) {
+            if (!isResource(entity)) {
+                const when = require("when");
+                return when.reject(`"${entity}" is not a valid Targetprocess resource.`);
+            }
+
             const request = require("request-promise-native");
             options.uri = `${uri}/${entity}/`;
             return request(options).then(normalize);

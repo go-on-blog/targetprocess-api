@@ -24,4 +24,22 @@ describe("query", function () {
             });
         });
     });
+
+    this.timeout(5000);
+
+    describe("get", function () {
+        it("should return a rejected promise when the resource is unknown", function () {
+            const query = sut(uri, token);
+
+            return expect(query.get("unknown"))
+                .to.eventually.be.rejected;
+        });
+
+        it("should return an object array", function () {
+            const query = sut(uri, token);
+
+            return expect(query.get("Projects"))
+                .to.eventually.be.an("array");
+        });
+    });
 });
