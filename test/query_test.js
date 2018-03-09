@@ -69,8 +69,38 @@ describe("query", function () {
         });
     });
 
-            return expect(query.get("Projects"))
-                .to.eventually.be.an("array");
+    describe("where", function () {
+        it("should return a rejected promise when the expression contains a syntax error", function () {
+            const query = sut(uri, token, "UserStories");
+            const syntaxError = "EntityState.Name 'In progress'";
+
+            return expect(query.where(syntaxError).get())
+                .to.eventually.be.rejected;
+        });
+
+        it("should return a subset of resources corresponding to the specified condition", function () {
+            const query = sut(uri, token, "Projects");
+            const condition = "Process.Name eq 'Scrum'";
+
+            return expect(query.get().then(function (set) {
+                return query.where(condition).get().then(function (subset) {
+                    function belongsToSet(item) {
+                        const deepEquals = require("mout/lang/deepEquals");
+                        var i = 0;
+
+                        while (i < set.length) {
+                            if (deepEquals(item, set[i])) {
+                                return true;
+                            }
+                            i += 1;
+                        }
+
+                        return false;
+                    }
+
+                    return (subset.length < set.length && subset.every(belongsToSet));
+                });
+            })).to.eventually.be.true;
         });
     });
 });
