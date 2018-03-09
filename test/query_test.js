@@ -23,7 +23,7 @@ describe("query", function () {
 
         it("should return an object having the specified API", function () {
             const query = sut(uri, token, "Projects");
-            const api = ["get", "take", "pick", "omit", "where", "append", "skip", "context"];
+            const api = ["get", "take", "skip", "where", "orderby", "pick", "omit", "append", "context"];
 
             expect(query).to.be.an("object");
             api.forEach(function (name) {
@@ -100,6 +100,21 @@ describe("query", function () {
 
                     return (subset.length < set.length && subset.every(belongsToSet));
                 });
+            })).to.eventually.be.true;
+        });
+    });
+
+    describe("orderby", function () {
+        it("should return an object array sorted by the specified attribute", function () {
+            const query = sut(uri, token, "UserStories");
+            const attribute = "Name";
+
+            return expect(query.orderby(attribute).get().then(function (items) {
+                const sort = require("mout/array/sort");
+                const equals = require("mout/array/equals");
+                const actual = items.map((i) => i[attribute]);
+
+                return equals(actual, sort(actual));
             })).to.eventually.be.true;
         });
     });

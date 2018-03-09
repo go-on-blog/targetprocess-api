@@ -55,6 +55,11 @@
             return this;
         }
 
+        function orderby(attribute) {
+            options.qs.orderby = attribute;
+            return this;
+        }
+
         function pick(keys) {
             if (options.qs.exclude) {
                 options.js.exclude = null;
@@ -90,6 +95,7 @@
             take,
             skip,
             where,
+            orderby,
             pick,
             omit,
             append,
