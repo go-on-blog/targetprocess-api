@@ -4,12 +4,7 @@
 (function () {
     "use strict";
 
-    function factory(uri, token) {
-        const options = {
-            qs: {token},
-            json: true,
-            headers: {Authorization: `Basic ${token}`}
-        };
+    function factory(uri, token, resource) {
         // See https://md5.tpondemand.com/api/v1/index/meta
         const resources = [
             "Assignables",
@@ -25,23 +20,39 @@
             "UserStories"
         ];
 
+        if (!resources.includes(resource)) {
+            throw new Error(`"${resource}" is not a valid Targetprocess resource.`);
+        }
+
+        const options = {
+            uri: `${uri}/${resource}/`,
+            qs: {token},
+            json: true,
+            headers: {Authorization: `Basic ${token}`}
+        };
+
         function normalize(response) {
             return response.Items;
         }
 
-        function isResource(name) {
-            return resources.includes(name);
+        function get() {
+            const request = require("request-promise-native");
+            return request(options).then(normalize);
         }
 
-        function get(entity) {
-            if (!isResource(entity)) {
-                const when = require("when");
-                return when.reject(`"${entity}" is not a valid Targetprocess resource.`);
-            }
+        function take(count) {
+            options.qs.take = count;
+            return this;
+        }
 
-            const request = require("request-promise-native");
-            options.uri = `${uri}/${entity}/`;
-            return request(options).then(normalize);
+        function skip(count) {
+            options.qs.skip = count;
+            return this;
+        }
+
+        function where(condition) {
+            options.qs.where = condition;
+            return this;
         }
 
         function pick(keys) {
@@ -64,23 +75,8 @@
             return this;
         }
 
-        function where(condition) {
-            options.qs.where = condition;
-            return this;
-        }
-
         function append(keys) {
             options.qs.append = `[${keys.join(",")}]`;
-            return this;
-        }
-
-        function take(count) {
-            options.qs.take = count;
-            return this;
-        }
-
-        function skip(count) {
-            options.qs.skip = count;
             return this;
         }
 
@@ -91,12 +87,12 @@
 
         return {
             get,
-            pick,
-            omit,
-            where,
-            append,
             take,
             skip,
+            where,
+            pick,
+            omit,
+            append,
             context
         };
     }

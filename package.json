@@ -15,6 +15,7 @@
     "url": "git@bitbucket:guillaume_oriol/targetprocess.git"
   },
   "dependencies": {
+    "mout": "^1.1.0",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "when": "^3.7.8"
