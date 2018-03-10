@@ -135,21 +135,56 @@ describe("query", function () {
     });
 
     describe("pick", function () {
+        it("should throw a TypeError when the given argument is not an array", function () {
+            function pick() {
+                const query = sut(uri, token, "Projects");
+                query.pick(false);
+            }
+
+            return expect(pick).to.throw(TypeError);
+        });
+
         it("should return objects with the specified attributes only", function () {
             const query = sut(uri, token, "Projects");
-            const attributes = ["Id", "Name", "Abbreviation"];
+            const attributes = ["CreateDate", "Abbreviation"];
+            const alwaysPresent = ["ResourceType", "Id"];
 
             return expect(query.pick(attributes).get().then(function (items) {
-                function hasSpecifiedAttributesOnly(item) {
+                function hasTheSpecifiedAttributesOnly(item) {
                     const equals = require("mout/array/equals");
                     const difference = require("mout/array/difference");
 
-                    return equals(difference(Object.keys(item), attributes), ["ResourceType"]);
+                    return equals(difference(Object.keys(item), attributes), alwaysPresent);
                 }
 
-                return items.every(hasSpecifiedAttributesOnly);
+                return items.every(hasTheSpecifiedAttributesOnly);
             })).to.eventually.be.true;
+        });
+    });
 
+    describe("omit", function () {
+        it("should throw a TypeError when the given argument is not an array", function () {
+            function omit() {
+                const query = sut(uri, token, "Projects");
+                query.omit(false);
+            }
+
+            return expect(omit).to.throw(TypeError);
+        });
+
+        it("should return objects without the specified attributes", function () {
+            const query = sut(uri, token, "Projects");
+            const attributes = ["CreateDate", "Abbreviation"];
+
+            return expect(query.omit(attributes).get().then(function (items) {
+                function hasNoneOfTheSpecifiedAttributes(item) {
+                    const intersection = require("mout/array/intersection");
+
+                    return intersection(Object.keys(item), attributes).length === 0;
+                }
+
+                return items.every(hasNoneOfTheSpecifiedAttributes);
+            })).to.eventually.be.true;
         });
     });
 });

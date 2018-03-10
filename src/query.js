@@ -67,16 +67,17 @@
 
         function pick(keys) {
             if (options.qs.exclude) {
-                options.js.exclude = null;
+                options.qs.exclude = null;
             }
 
+            // Nested attributes are not supported yet
             options.qs.include = `[${keys.join(",")}]`;
             return this;
         }
 
         function omit(keys) {
             if (options.qs.include) {
-                options.js.include = null;
+                options.qs.include = null;
             }
 
             // Nested attributes are not supported yet
