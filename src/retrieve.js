@@ -82,8 +82,7 @@
         const options = {
             uri: `${uri}/${resource}/`,
             qs: {token},
-            json: true,
-            headers: {Authorization: `Basic ${token}`}
+            json: true
         };
 
         function normalize(response) {

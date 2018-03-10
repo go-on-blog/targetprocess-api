@@ -5,11 +5,11 @@ const {describe, it} = require("mocha");
 const chai = require("chai");
 const expect = chai.expect;
 const chaiAsPromised = require("chai-as-promised");
-const sut = require("../src/query");
+const sut = require("../src/retrieve");
 const {uri, token} = require("../config/credentials");
 chai.use(chaiAsPromised);
 
-describe("query", function () {
+describe("retrieve", function () {
     "use strict";
 
     describe("factory", function () {
@@ -21,14 +21,14 @@ describe("query", function () {
             return expect(factory).to.throw(Error);
         });
 
-        it("should return an object having the specified API", function () {
-            const query = sut(uri, token, "Projects");
+        it("should return an object having the expected API", function () {
+            const retrieve = sut(uri, token, "Projects");
             const api = ["get", "take", "skip", "where", "orderby", "orderbydesc", "pick", "omit", "append"];
 
-            expect(query).to.be.an("object");
+            expect(retrieve).to.be.an("object");
             api.forEach(function (name) {
-                expect(query).to.have.own.property(name);
-                expect(query[name]).to.be.a("function");
+                expect(retrieve).to.have.own.property(name);
+                expect(retrieve[name]).to.be.a("function");
             });
         });
     });
@@ -36,13 +36,13 @@ describe("query", function () {
     this.timeout(10000);
 
     describe("get", function () {
-        it("should return an object array for every possible resource", function () {
+        it("should return an object array corresponding to the specified resource", function () {
             const when = require("when");
-            const {resources} = require("../src/query");
+            const {resources} = require("../src/retrieve");
 
             function get(resource) {
-                const query = sut(uri, token, resource);
-                return expect(query.get()).to.eventually.be.an("array");
+                const retrieve = sut(uri, token, resource);
+                return expect(retrieve.get()).to.eventually.be.an("array");
             }
 
             return when.all(resources.map(get));
@@ -51,10 +51,10 @@ describe("query", function () {
 
     describe("take", function () {
         it("should return an array containing the specified item count", function () {
-            const query = sut(uri, token, "Features");
+            const retrieve = sut(uri, token, "Features");
             const LIMIT = 2;
 
-            return expect(query.take(LIMIT).get())
+            return expect(retrieve.take(LIMIT).get())
                 .to.eventually.be.an("array")
                 .and.to.eventually.have.lengthOf(LIMIT);
         });
@@ -62,11 +62,11 @@ describe("query", function () {
 
     describe("skip", function () {
         it("should return items different from the previous page", function () {
-            const query = sut(uri, token, "UserStories");
+            const retrieve = sut(uri, token, "UserStories");
             const LIMIT = 2;
 
-            return expect(query.take(LIMIT).get().then(function (first) {
-                return query.take(LIMIT).skip(LIMIT).get().then(function (second) {
+            return expect(retrieve.take(LIMIT).get().then(function (first) {
+                return retrieve.take(LIMIT).skip(LIMIT).get().then(function (second) {
                     const deepEquals = require("mout/lang/deepEquals");
                     return deepEquals(first, second);
                 });
@@ -76,19 +76,19 @@ describe("query", function () {
 
     describe("where", function () {
         it("should return a rejected promise when the expression contains a syntax error", function () {
-            const query = sut(uri, token, "UserStories");
+            const retrieve = sut(uri, token, "UserStories");
             const syntaxError = "EntityState.Name 'In progress'";
 
-            return expect(query.where(syntaxError).get())
+            return expect(retrieve.where(syntaxError).get())
                 .to.eventually.be.rejected;
         });
 
         it("should return a subset of resources corresponding to the specified condition", function () {
-            const query = sut(uri, token, "Projects");
+            const retrieve = sut(uri, token, "Projects");
             const condition = "Process.Name eq 'Scrum'";
 
-            return expect(query.get().then(function (set) {
-                return query.where(condition).get().then(function (subset) {
+            return expect(retrieve.get().then(function (set) {
+                return retrieve.where(condition).get().then(function (subset) {
                     function belongsToSet(item) {
                         const deepEquals = require("mout/lang/deepEquals");
                         var i = 0;
@@ -111,10 +111,10 @@ describe("query", function () {
 
     describe("orderby", function () {
         it("should return an object array sorted by the specified attribute in ascending order", function () {
-            const query = sut(uri, token, "Bugs");
+            const retrieve = sut(uri, token, "Bugs");
             const attribute = "Name";
 
-            return expect(query.orderby(attribute).get().then(function (items) {
+            return expect(retrieve.orderby(attribute).get().then(function (items) {
                 const sort = require("mout/array/sort");
                 const equals = require("mout/array/equals");
                 const actual = items.map((i) => i[attribute]);
@@ -126,10 +126,10 @@ describe("query", function () {
 
     describe("orderbydesc", function () {
         it("should return an object array sorted by the specified attribute in descending order", function () {
-            const query = sut(uri, token, "Bugs");
+            const retrieve = sut(uri, token, "Bugs");
             const attribute = "Name";
 
-            return expect(query.orderbydesc(attribute).get().then(function (items) {
+            return expect(retrieve.orderbydesc(attribute).get().then(function (items) {
                 const sort = require("mout/array/sort");
                 const equals = require("mout/array/equals");
                 const actual = items.map((i) => i[attribute]);
@@ -142,19 +142,19 @@ describe("query", function () {
     describe("pick", function () {
         it("should throw a TypeError when the given argument is not an array", function () {
             function pick() {
-                const query = sut(uri, token, "Projects");
-                query.pick(false);
+                const retrieve = sut(uri, token, "Projects");
+                retrieve.pick(false);
             }
 
             return expect(pick).to.throw(TypeError);
         });
 
         it("should return objects with the specified attributes only", function () {
-            const query = sut(uri, token, "Projects");
+            const retrieve = sut(uri, token, "Projects");
             const attributes = ["CreateDate", "Abbreviation"];
             const alwaysPresent = ["ResourceType", "Id"];
 
-            return expect(query.pick(attributes).get().then(function (items) {
+            return expect(retrieve.pick(attributes).get().then(function (items) {
                 function hasTheSpecifiedAttributesOnly(item) {
                     const equals = require("mout/array/equals");
                     const difference = require("mout/array/difference");
@@ -170,18 +170,18 @@ describe("query", function () {
     describe("omit", function () {
         it("should throw a TypeError when the given argument is not an array", function () {
             function omit() {
-                const query = sut(uri, token, "Projects");
-                query.omit(false);
+                const retrieve = sut(uri, token, "Projects");
+                retrieve.omit(false);
             }
 
             return expect(omit).to.throw(TypeError);
         });
 
         it("should return objects without the specified attributes", function () {
-            const query = sut(uri, token, "Projects");
+            const retrieve = sut(uri, token, "Projects");
             const attributes = ["CreateDate", "Abbreviation"];
 
-            return expect(query.omit(attributes).get().then(function (items) {
+            return expect(retrieve.omit(attributes).get().then(function (items) {
                 function hasNoneOfTheSpecifiedAttributes(item) {
                     const intersection = require("mout/array/intersection");
                     return intersection(Object.keys(item), attributes).length === 0;
@@ -195,18 +195,18 @@ describe("query", function () {
     describe("append", function () {
         it("should throw a TypeError when the given argument is not an array", function () {
             function omit() {
-                const query = sut(uri, token, "Projects");
-                query.omit(false);
+                const retrieve = sut(uri, token, "Projects");
+                retrieve.omit(false);
             }
 
             return expect(omit).to.throw(TypeError);
         });
 
         it("should return objects with the specified calculations appended", function () {
-            const query = sut(uri, token, "Projects");
+            const retrieve = sut(uri, token, "Projects");
             const calculations = ["UserStories-Effort-Avg"];
 
-            return expect(query.append(calculations).get().then(function (items) {
+            return expect(retrieve.append(calculations).get().then(function (items) {
                 function hasTheSpecifiedCalculations(item) {
                     const intersection = require("mout/array/intersection");
                     return intersection(Object.keys(item), calculations).length === calculations.length;
