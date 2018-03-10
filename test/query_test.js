@@ -133,4 +133,23 @@ describe("query", function () {
             })).to.eventually.be.true;
         });
     });
+
+    describe("pick", function () {
+        it("should return objects with the specified attributes only", function () {
+            const query = sut(uri, token, "Projects");
+            const attributes = ["Id", "Name", "Abbreviation"];
+
+            return expect(query.pick(attributes).get().then(function (items) {
+                function hasSpecifiedAttributesOnly(item) {
+                    const equals = require("mout/array/equals");
+                    const difference = require("mout/array/difference");
+
+                    return equals(difference(Object.keys(item), attributes), ["ResourceType"]);
+                }
+
+                return items.every(hasSpecifiedAttributesOnly);
+            })).to.eventually.be.true;
+
+        });
+    });
 });
