@@ -187,4 +187,30 @@ describe("query", function () {
             })).to.eventually.be.true;
         });
     });
+
+    describe("append", function () {
+        it("should throw a TypeError when the given argument is not an array", function () {
+            function omit() {
+                const query = sut(uri, token, "Projects");
+                query.omit(false);
+            }
+
+            return expect(omit).to.throw(TypeError);
+        });
+
+        it("should return objects with the specified calculations appended", function () {
+            const query = sut(uri, token, "Projects");
+            const calculations = ["UserStories-Effort-Avg"];
+
+            return expect(query.append(calculations).get().then(function (items) {
+                function hasTheSpecifiedCalculations(item) {
+                    const intersection = require("mout/array/intersection");
+
+                    return intersection(Object.keys(item), calculations).length === calculations.length;
+                }
+
+                return items.every(hasTheSpecifiedCalculations);
+            })).to.eventually.be.true;
+        });
+    });
 });
