@@ -90,11 +90,6 @@
             return this;
         }
 
-        function context(id) {
-            options.qs.acid = id;
-            return this;
-        }
-
         return {
             get,
             take,
@@ -104,8 +99,7 @@
             orderbydesc,
             pick,
             omit,
-            append,
-            context
+            append
         };
     }
 

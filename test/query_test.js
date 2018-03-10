@@ -23,7 +23,7 @@ describe("query", function () {
 
         it("should return an object having the specified API", function () {
             const query = sut(uri, token, "Projects");
-            const api = ["get", "take", "skip", "where", "orderby", "orderbydesc", "pick", "omit", "append", "context"];
+            const api = ["get", "take", "skip", "where", "orderby", "orderbydesc", "pick", "omit", "append"];
 
             expect(query).to.be.an("object");
             api.forEach(function (name) {
