@@ -60,12 +60,16 @@
             return this;
         }
 
+        function orderbydesc(attribute) {
+            options.qs.orderbydesc = attribute;
+            return this;
+        }
+
         function pick(keys) {
             if (options.qs.exclude) {
                 options.js.exclude = null;
             }
 
-            // Nested attributes are not supported yet
             options.qs.include = `[${keys.join(",")}]`;
             return this;
         }
@@ -96,6 +100,7 @@
             skip,
             where,
             orderby,
+            orderbydesc,
             pick,
             omit,
             append,

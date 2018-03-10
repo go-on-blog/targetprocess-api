@@ -23,7 +23,7 @@ describe("query", function () {
 
         it("should return an object having the specified API", function () {
             const query = sut(uri, token, "Projects");
-            const api = ["get", "take", "skip", "where", "orderby", "pick", "omit", "append", "context"];
+            const api = ["get", "take", "skip", "where", "orderby", "orderbydesc", "pick", "omit", "append", "context"];
 
             expect(query).to.be.an("object");
             api.forEach(function (name) {
@@ -105,8 +105,8 @@ describe("query", function () {
     });
 
     describe("orderby", function () {
-        it("should return an object array sorted by the specified attribute", function () {
-            const query = sut(uri, token, "UserStories");
+        it("should return an object array sorted by the specified attribute in ascending order", function () {
+            const query = sut(uri, token, "Bugs");
             const attribute = "Name";
 
             return expect(query.orderby(attribute).get().then(function (items) {
@@ -115,6 +115,21 @@ describe("query", function () {
                 const actual = items.map((i) => i[attribute]);
 
                 return equals(actual, sort(actual));
+            })).to.eventually.be.true;
+        });
+    });
+
+    describe("orderbydesc", function () {
+        it("should return an object array sorted by the specified attribute in descending order", function () {
+            const query = sut(uri, token, "Bugs");
+            const attribute = "Name";
+
+            return expect(query.orderbydesc(attribute).get().then(function (items) {
+                const sort = require("mout/array/sort");
+                const equals = require("mout/array/equals");
+                const actual = items.map((i) => i[attribute]);
+
+                return equals(actual, sort(actual).reverse());
             })).to.eventually.be.true;
         });
     });
