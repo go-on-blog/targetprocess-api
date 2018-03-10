@@ -33,14 +33,19 @@ describe("query", function () {
         });
     });
 
-    this.timeout(5000);
+    this.timeout(10000);
 
     describe("get", function () {
-        it("should return an object array", function () {
-            const query = sut(uri, token, "Projects");
+        it("should return an object array for every possible resource", function () {
+            const when = require("when");
+            const {resources} = require("../src/query");
 
-            return expect(query.get())
-                .to.eventually.be.an("array");
+            function get(resource) {
+                const query = sut(uri, token, resource);
+                return expect(query.get()).to.eventually.be.an("array");
+            }
+
+            return when.all(resources.map(get));
         });
     });
 
@@ -179,7 +184,6 @@ describe("query", function () {
             return expect(query.omit(attributes).get().then(function (items) {
                 function hasNoneOfTheSpecifiedAttributes(item) {
                     const intersection = require("mout/array/intersection");
-
                     return intersection(Object.keys(item), attributes).length === 0;
                 }
 
@@ -205,7 +209,6 @@ describe("query", function () {
             return expect(query.append(calculations).get().then(function (items) {
                 function hasTheSpecifiedCalculations(item) {
                     const intersection = require("mout/array/intersection");
-
                     return intersection(Object.keys(item), calculations).length === calculations.length;
                 }
 

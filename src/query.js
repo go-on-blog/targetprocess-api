@@ -4,22 +4,77 @@
 (function () {
     "use strict";
 
-    function factory(uri, token, resource) {
-        // See https://md5.tpondemand.com/api/v1/index/meta
-        const resources = [
-            "Assignables",
-            "Bugs",
-            "Epics",
-            "Features",
-            "Generals",
-            "Projects",
-            "ProjectMembers",
-            "Requesters",
-            "Tasks",
-            "Users",
-            "UserStories"
-        ];
+    // See https://md5.tpondemand.com/api/v1/index/meta
+    const resources = [
+        "Assignables",
+        "AssignedEfforts",
+        "Assignments",
+        "Attachments",
+        "Bugs",
+        "Builds",
+        "Comments",
+        "Companies",
+        "CustomActivities",
+        "CustomFields",
+        "CustomRules",
+        "EntityStates",
+        "EntityTypes",
+        "Epics",
+        "Features",
+        "Generals",
+        "GeneralFollowers",
+        "GeneralUsers",
+        "GlobalSettings",
+        "Impediments",
+        "InboundAssignables",
+        "Iterations",
+        "Messages",
+        "MessageUids",
+        "Milestones",
+        "OutboundAssignables",
+        "Priorities",
+        "Processes",
+        "Programs",
+        "Projects",
+        "ProjectAllocations",
+        "ProjectMembers",
+        "Relations",
+        "RelationTypes",
+        "Releases",
+        "ReleaseProjects",
+        "Requests",
+        "Requesters",
+        "RequestTypes",
+        "Revisions",
+        "RevisionFiles",
+        "Roles",
+        "RoleEfforts",
+        "RoleEntityTypes",
+        "Severities",
+        "Tags",
+        "Tasks",
+        "Teams",
+        "TeamAssignments",
+        "TeamIterations",
+        "TeamMembers",
+        "TeamProjects",
+        "TeamProjectAllocations",
+        "Terms",
+        "TestCases",
+        "TestCaseRuns",
+        "TestPlans",
+        "TestPlanRuns",
+        "TestRunItemHierarchyLinks",
+        "TestSteps",
+        "TestStepRuns",
+        "Times",
+        "Users",
+        "UserProjectAllocations",
+        "UserStories",
+        "Workflows"
+    ];
 
+    function factory(uri, token, resource) {
         if (!resources.includes(resource)) {
             throw new Error(`"${resource}" is not a valid Targetprocess resource.`);
         }
@@ -104,4 +159,5 @@
     }
 
     module.exports = factory;
+    module.exports.resources = resources;
 }());
