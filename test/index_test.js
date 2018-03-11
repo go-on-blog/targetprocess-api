@@ -3,10 +3,10 @@
 */
 const {describe, it} = require("mocha");
 const {expect} = require("chai");
-const sut = require("../src/configure");
+const sut = require("../src/index");
 const {domain, token} = require("../config/credentials");
 
-describe("configure", function () {
+describe("index", function () {
     "use strict";
 
     describe("factory", function () {
@@ -39,13 +39,13 @@ describe("configure", function () {
         });
 
         it("should return an object having the expected API", function () {
-            const configure = sut({domain, token});
+            const index = sut({domain, token});
             const api = ["create", "retrieve", "update", "remove"];
 
-            expect(configure).to.be.an("object");
+            expect(index).to.be.an("object");
             api.forEach(function (name) {
-                expect(configure).to.have.own.property(name);
-                expect(configure[name]).to.be.a("function");
+                expect(index).to.have.own.property(name);
+                expect(index[name]).to.be.a("function");
             });
         });
     });

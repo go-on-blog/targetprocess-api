@@ -1,1 +1,16 @@
-"# tp-api-wrapper" 
+# tp-api-wrapper
+
+## Sample usage
+
+    const factory = require("tp-api-wrapper");
+    const tp = factory(config);
+
+    tp.create("Projects", {Name: "My Project"})
+        .then(function (entity) {
+            // ...
+        });
+
+    tp.retrieve("UserStories").take(10).get()
+        .then(function (items) {
+            // ...
+        });
