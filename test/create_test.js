@@ -6,7 +6,9 @@ const chai = require("chai");
 const expect = chai.expect;
 const chaiAsPromised = require("chai-as-promised");
 const sut = require("../src/create");
-const {uri, token} = require("../config/credentials");
+const {domain, token} = require("../config/credentials");
+const uri = `https://${domain}/api/v1`;
+
 chai.use(chaiAsPromised);
 
 describe("create", function () {

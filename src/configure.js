@@ -14,15 +14,40 @@
         }
 
         if (!options.token) {
-            throw new Error("Targetprocess credentials are required");
+            throw new Error("Targetprocess credentials are missing");
         }
 
         if (!options.domain) {
-            throw new Error("A Targetprocess domain is required");
+            throw new Error("Targetprocess domain is missing");
         }
 
         const base = `${options.protocol}://${options.domain}/api/v${options.version}`;
-        return base;
+
+        function create(resource, value) {
+            const func = require("./create")(base, options.token, resource);
+            return func(value);
+        }
+
+        function retrieve(resource) {
+            const func = require("./retrieve")(base, options.token, resource);
+            return func;
+        }
+
+        function update() {
+            return false;
+        }
+
+        // "delete" is a reserved keyword in JavaScript
+        function remove() {
+            return false;
+        }
+
+        return {
+            create,
+            retrieve,
+            update,
+            remove
+        };
     }
 
     module.exports = factory;
