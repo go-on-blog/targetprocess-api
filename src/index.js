@@ -23,9 +23,9 @@
 
         const base = `${options.protocol}://${options.domain}/api/v${options.version}`;
 
-        function create(resource, value) {
+        function create(resource, obj) {
             const func = require("./create")(base, options.token, resource);
-            return func(value);
+            return func(obj);
         }
 
         function retrieve(resource) {
@@ -33,13 +33,15 @@
             return func;
         }
 
-        function update() {
-            return false;
+        function update(resource, obj) {
+            const func = require("./update")(base, options.token, resource);
+            return func(obj);
         }
 
         // "delete" is a reserved keyword in JavaScript
-        function remove() {
-            return false;
+        function remove(resource, id) {
+            const func = require("./remove")(base, options.token, resource);
+            return func(id);
         }
 
         return {

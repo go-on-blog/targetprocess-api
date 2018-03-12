@@ -14,3 +14,8 @@
         .then(function (items) {
             // ...
         });
+
+    tp.update("Bugs", {Id: 3, Name: "My bug"});
+
+    tp.remove("Releases", 12);
+    
