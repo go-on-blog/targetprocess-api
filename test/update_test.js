@@ -51,7 +51,7 @@ describe("update", function () {
     });
 
     describe("update", function () {
-        it("should throw an error when the Id is missing", function () {
+        it("should return a rejected promise when the Id is missing", function () {
             const update = sut(uri, token, "Projects");
 
             return expect(update.update({"Name": "updated"}))

@@ -76,17 +76,31 @@
 
     function factory(uri, token, resource) {
         if (!resources.includes(resource)) {
-            throw new Error(`"${resource}" is not available for creation.`);
+            throw new Error(`"${resource}" is not available for deletion.`);
         }
 
         const options = {
+            method: "DELETE",
             uri: `${uri}/${resource}/`,
             qs: {token},
-            json: true,
-            headers: {Authorization: `Basic ${token}`}
+            json: true
         };
 
-        return {options};
+        function remove(id) {
+            const request = require("request-promise-native");
+
+            if (!id) {
+                const when = require("when");
+                return when.reject(new Error("The id must be provided in order to perform this deletion"));
+            }
+
+            options.uri = options.uri.concat(id);
+            return request(options);
+        }
+
+        return {
+            remove
+        };
     }
 
     module.exports = factory;
