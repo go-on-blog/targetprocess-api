@@ -1,8 +1,8 @@
 {
   "name": "tp-api-wrapper",
-  "version": "0.0.1",
-  "description": "Targetprocess REST API wrapper",
-  "author": "Guillaume Oriol <guillaume@go-on.blog>",
+  "version": "0.1.0",
+  "description": "Targetprocess API wrapper",
+  "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
@@ -12,7 +12,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@bitbucket:guillaume_oriol/targetprocess.git"
+    "url": "https://github.com/go-on-blog/tp-api-wrapper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/go-on-blog/tp-api-wrapper/issues"
   },
   "dependencies": {
     "mout": "^1.1.0",
@@ -27,6 +30,7 @@
     "mocha": "latest"
   },
   "keywords": [
-    "targetprocess"
+    "targetprocess",
+    "api"
   ]
 }
