@@ -1,8 +1,8 @@
-# tp-api-wrapper
+# targetprocess-api
 
 ## Sample usage
 
-    const factory = require("tp-api-wrapper");
+    const factory = require("targetprocess-api");
     const tp = factory(config);
 
     tp.create("Projects", {Name: "My Project"})
