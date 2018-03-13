@@ -1,5 +1,7 @@
 # targetprocess-api
 
+[![Build Status](https://travis-ci.org/go-on-blog/targetprocess-api.svg?branch=master)](https://travis-ci.org/go-on-blog/targetprocess-api)
+
 ## Sample usage
 
     const factory = require("targetprocess-api");
