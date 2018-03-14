@@ -13,9 +13,7 @@ chai.use(chaiAsPromised);
 
 describe("update", function () {
     "use strict";
-    const id = 2;
-    var oldName;
-    var oldAbbreviation;
+    var id;
 
     describe("factory", function () {
         it("should throw an error when the resource is not allowed for update", function () {
@@ -41,12 +39,15 @@ describe("update", function () {
     this.timeout(5000);
 
     before(function () {
-        const factory = require("../src/retrieve");
-        const retrieve = factory(uri, token, "Projects");
+        const factory = require("../src/create");
+        const create = factory(uri, token, "Projects");
+        const obj = {
+            "Name": Math.random().toString(36).replace(/[^a-z]+/g, ""),
+            "Abbreviation": Math.random().toString(36).replace(/[^a-z]+/g, "").substr(0, 3)
+        };
 
-        return retrieve.where(`Id eq ${id}`).get().then(function (items) {
-            oldName = items[0].Name;
-            oldAbbreviation = items[0].Abbreviation;
+        return create.create(obj).then(function (item) {
+            id = item.Id;
         });
     });
 
@@ -73,13 +74,9 @@ describe("update", function () {
     });
 
     after(function () {
-        const update = sut(uri, token, "Projects");
-        const obj = {
-            "Id": id,
-            "Name": oldName,
-            "Abbreviation": oldAbbreviation
-        };
+        const factory = require("../src/remove");
+        const remove = factory(uri, token, "Projects");
 
-        return update.update(obj);
+        return remove.remove(id);
     });
 });
