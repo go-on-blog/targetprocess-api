@@ -3,6 +3,5 @@ node_js:
   - "lts/*"
   - "8"
   - "6"
-  - "4"
 install:
   - npm install

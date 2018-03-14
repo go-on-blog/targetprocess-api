@@ -1,6 +1,6 @@
 {
   "name": "targetprocess-api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Targetprocess API wrapper",
   "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
   "license": "MIT",
@@ -28,6 +28,9 @@
     "chai-as-promised": "latest",
     "jslint": "latest",
     "mocha": "latest"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   },
   "keywords": [
     "targetprocess",
