@@ -25,7 +25,7 @@
 
         function create(resource, obj) {
             const func = require("./create")(base, options.token, resource);
-            return func(obj);
+            return func.create(obj);
         }
 
         function retrieve(resource) {
@@ -35,13 +35,13 @@
 
         function update(resource, obj) {
             const func = require("./update")(base, options.token, resource);
-            return func(obj);
+            return func.update(obj);
         }
 
         // "delete" is a reserved keyword in JavaScript
         function remove(resource, id) {
             const func = require("./remove")(base, options.token, resource);
-            return func(id);
+            return func.remove(id);
         }
 
         return {
