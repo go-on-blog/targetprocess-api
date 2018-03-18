@@ -5,7 +5,7 @@ const {after, describe, it} = require("mocha");
 const chai = require("chai");
 const expect = chai.expect;
 const chaiAsPromised = require("chai-as-promised");
-const sut = require("../src/create");
+const sut = require("../create");
 const {domain, token} = require("../config/credentials");
 const uri = `https://${domain}/api/v1`;
 
@@ -57,7 +57,7 @@ describe("create", function () {
     });
 
     after(function () {
-        const factory = require("../src/remove");
+        const factory = require("../remove");
         const remove = factory(uri, token, "Projects");
 
         return remove.remove(id);

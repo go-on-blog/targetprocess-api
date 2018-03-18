@@ -5,7 +5,7 @@ const {describe, it} = require("mocha");
 const chai = require("chai");
 const expect = chai.expect;
 const chaiAsPromised = require("chai-as-promised");
-const sut = require("../src/retrieve");
+const sut = require("../retrieve");
 const {domain, token} = require("../config/credentials");
 const uri = `https://${domain}/api/v1`;
 chai.use(chaiAsPromised);
@@ -39,7 +39,7 @@ describe("retrieve", function () {
     describe("get", function () {
         it("should return an object array corresponding to the specified resource", function () {
             const when = require("when");
-            const {resources} = require("../src/retrieve");
+            const {resources} = require("../retrieve");
 
             function get(resource) {
                 const retrieve = sut(uri, token, resource);

@@ -1,10 +1,10 @@
 {
   "name": "targetprocess-api",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Targetprocess API wrapper",
   "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
   "license": "MIT",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "lint": "jslint --edition=latest --fudge \"src/**/*.js\"",
     "lint:test": "jslint --edition=latest --fudge \"test/**/*.js\"",

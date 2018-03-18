@@ -3,7 +3,7 @@
 */
 const {describe, it} = require("mocha");
 const {expect} = require("chai");
-const sut = require("../src/index");
+const sut = require("../index");
 const {domain, token} = require("../config/credentials");
 
 describe("index", function () {

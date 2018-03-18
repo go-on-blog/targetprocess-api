@@ -5,7 +5,7 @@ const {before, describe, it} = require("mocha");
 const chai = require("chai");
 const expect = chai.expect;
 const chaiAsPromised = require("chai-as-promised");
-const sut = require("../src/remove");
+const sut = require("../remove");
 const {domain, token} = require("../config/credentials");
 const uri = `https://${domain}/api/v1`;
 
@@ -39,7 +39,7 @@ describe("remove", function () {
     this.timeout(5000);
 
     before(function () {
-        const factory = require("../src/create");
+        const factory = require("../create");
         const create = factory(uri, token, "Projects");
         const name = Math.random().toString(36).replace(/[^a-z]+/g, "");
 
