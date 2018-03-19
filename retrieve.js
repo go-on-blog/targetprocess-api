@@ -4,159 +4,140 @@
 (function () {
     "use strict";
 
-    // See https://md5.tpondemand.com/api/v1/index/meta
-    const resources = [
-        "Assignables",
-        "AssignedEfforts",
-        "Assignments",
-        "Attachments",
-        "Bugs",
-        "Builds",
-        "Comments",
-        "Companies",
-        "CustomActivities",
-        "CustomFields",
-        "CustomRules",
-        "EntityStates",
-        "EntityTypes",
-        "Epics",
-        "Features",
-        "Generals",
-        "GeneralFollowers",
-        "GeneralUsers",
-        "GlobalSettings",
-        "Impediments",
-        "InboundAssignables",
-        "Iterations",
-        "Messages",
-        "MessageUids",
-        "Milestones",
-        "OutboundAssignables",
-        "Priorities",
-        "Processes",
-        "Programs",
-        "Projects",
-        "ProjectAllocations",
-        "ProjectMembers",
-        "Relations",
-        "RelationTypes",
-        "Releases",
-        "ReleaseProjects",
-        "Requests",
-        "Requesters",
-        "RequestTypes",
-        "Revisions",
-        "RevisionFiles",
-        "Roles",
-        "RoleEfforts",
-        "RoleEntityTypes",
-        "Severities",
-        "Tags",
-        "Tasks",
-        "Teams",
-        "TeamAssignments",
-        "TeamIterations",
-        "TeamMembers",
-        "TeamProjects",
-        "TeamProjectAllocations",
-        "Terms",
-        "TestCases",
-        "TestCaseRuns",
-        "TestPlans",
-        "TestPlanRuns",
-        "TestRunItemHierarchyLinks",
-        "TestSteps",
-        "TestStepRuns",
-        "Times",
-        "Users",
-        "UserProjectAllocations",
-        "UserStories",
-        "Workflows"
-    ];
+    const stampit = require("@stamp/it");
+    const configure = require("./configure");
+    const operation = require("./operation");
 
-    function factory(uri, token, resource) {
-        if (!resources.includes(resource)) {
-            throw new Error(`"${resource}" is not a valid Targetprocess resource.`);
-        }
+    module.exports = stampit(configure, operation, {
+        statics: {
+            // See https://md5.tpondemand.com/api/v1/index/meta
+            resources: [
+                "Assignables",
+                "AssignedEfforts",
+                "Assignments",
+                "Attachments",
+                "Bugs",
+                "Builds",
+                "Comments",
+                "Companies",
+                "CustomActivities",
+                "CustomFields",
+                "CustomRules",
+                "EntityStates",
+                "EntityTypes",
+                "Epics",
+                "Features",
+                "Generals",
+                "GeneralFollowers",
+                "GeneralUsers",
+                "GlobalSettings",
+                "Impediments",
+                "InboundAssignables",
+                "Iterations",
+                "Messages",
+                "MessageUids",
+                "Milestones",
+                "OutboundAssignables",
+                "Priorities",
+                "Processes",
+                "Programs",
+                "Projects",
+                "ProjectAllocations",
+                "ProjectMembers",
+                "Relations",
+                "RelationTypes",
+                "Releases",
+                "ReleaseProjects",
+                "Requests",
+                "Requesters",
+                "RequestTypes",
+                "Revisions",
+                "RevisionFiles",
+                "Roles",
+                "RoleEfforts",
+                "RoleEntityTypes",
+                "Severities",
+                "Tags",
+                "Tasks",
+                "Teams",
+                "TeamAssignments",
+                "TeamIterations",
+                "TeamMembers",
+                "TeamProjects",
+                "TeamProjectAllocations",
+                "Terms",
+                "TestCases",
+                "TestCaseRuns",
+                "TestPlans",
+                "TestPlanRuns",
+                "TestRunItemHierarchyLinks",
+                "TestSteps",
+                "TestStepRuns",
+                "Times",
+                "Users",
+                "UserProjectAllocations",
+                "UserStories",
+                "Workflows"
+            ]
+        },
+        methods: {
+            get() {
+                function normalize(response) {
+                    return response.Items;
+                }
 
-        const options = {
-            uri: `${uri}/${resource}/`,
-            qs: {token},
-            json: true
-        };
+                return this.request(this.options).then(normalize);
+            },
 
-        function normalize(response) {
-            return response.Items;
-        }
+            take(count) {
+                this.options.qs.take = count;
+                return this;
+            },
 
-        function get() {
-            const request = require("request-promise-native");
-            return request(options).then(normalize);
-        }
+            skip(count) {
+                this.options.qs.skip = count;
+                return this;
+            },
 
-        function take(count) {
-            options.qs.take = count;
-            return this;
-        }
+            where(condition) {
+                this.options.qs.where = condition;
+                return this;
+            },
 
-        function skip(count) {
-            options.qs.skip = count;
-            return this;
-        }
+            orderby(attribute) {
+                this.options.qs.orderby = attribute;
+                return this;
+            },
 
-        function where(condition) {
-            options.qs.where = condition;
-            return this;
-        }
+            orderbydesc(attribute) {
+                this.options.qs.orderbydesc = attribute;
+                return this;
+            },
 
-        function orderby(attribute) {
-            options.qs.orderby = attribute;
-            return this;
-        }
+            pick(keys) {
+                if (this.options.qs.exclude) {
+                    this.options.qs.exclude = null;
+                }
 
-        function orderbydesc(attribute) {
-            options.qs.orderbydesc = attribute;
-            return this;
-        }
+                // Nested attributes are not supported yet
+                this.options.qs.include = `[${keys.join(",")}]`;
+                return this;
+            },
 
-        function pick(keys) {
-            if (options.qs.exclude) {
-                options.qs.exclude = null;
+            omit(keys) {
+                if (this.options.qs.include) {
+                    this.options.qs.include = null;
+                }
+
+                // Nested attributes are not supported yet
+                this.options.qs.exclude = `[${keys.join(",")}]`;
+                return this;
+            },
+
+            append(keys) {
+                this.options.qs.append = `[${keys.join(",")}]`;
+                return this;
             }
-
-            // Nested attributes are not supported yet
-            options.qs.include = `[${keys.join(",")}]`;
-            return this;
         }
-
-        function omit(keys) {
-            if (options.qs.include) {
-                options.qs.include = null;
-            }
-
-            // Nested attributes are not supported yet
-            options.qs.exclude = `[${keys.join(",")}]`;
-            return this;
-        }
-
-        function append(keys) {
-            options.qs.append = `[${keys.join(",")}]`;
-            return this;
-        }
-
-        return {
-            get,
-            take,
-            skip,
-            where,
-            orderby,
-            orderbydesc,
-            pick,
-            omit,
-            append
-        };
-    }
-
-    module.exports = factory;
-    module.exports.resources = resources;
+    });
 }());

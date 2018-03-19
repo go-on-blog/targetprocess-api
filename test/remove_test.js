@@ -5,9 +5,9 @@ const {before, describe, it} = require("mocha");
 const chai = require("chai");
 const expect = chai.expect;
 const chaiAsPromised = require("chai-as-promised");
-const sut = require("../remove");
-const {domain, token} = require("../config/credentials");
-const uri = `https://${domain}/api/v1`;
+const factory = require("../remove");
+const credentials = require("../config/credentials");
+const config = Object.assign({resource: "Projects"}, credentials);
 
 chai.use(chaiAsPromised);
 
@@ -17,21 +17,20 @@ describe("remove", function () {
 
     describe("factory", function () {
         it("should throw an error when the resource is not allowed for deletion", function () {
-            function factory() {
-                sut(uri, token, "not allowed");
+            function constructor() {
+                factory(Object.assign({resource: "not allowed"}, credentials));
             }
 
-            return expect(factory).to.throw(Error);
+            return expect(constructor).to.throw(Error);
         });
 
         it("should return an object having the expected API", function () {
-            const remove = sut(uri, token, "Projects");
+            const sut = factory(config);
             const api = ["remove"];
 
-            expect(remove).to.be.an("object");
+            expect(sut).to.be.an("object");
             api.forEach(function (name) {
-                expect(remove).to.have.own.property(name);
-                expect(remove[name]).to.be.a("function");
+                expect(sut[name]).to.be.a("function");
             });
         });
     });
@@ -39,8 +38,7 @@ describe("remove", function () {
     this.timeout(5000);
 
     before(function () {
-        const factory = require("../create");
-        const create = factory(uri, token, "Projects");
+        const create = require("../create")(config);
         const name = Math.random().toString(36).replace(/[^a-z]+/g, "");
 
         return create.create({"Name": name}).then(function (item) {
@@ -50,16 +48,16 @@ describe("remove", function () {
 
     describe("remove", function () {
         it("should return a rejected promise when the Id is missing", function () {
-            const remove = sut(uri, token, "Projects");
+            const sut = factory(config);
 
-            return expect(remove.remove())
+            return expect(sut.remove())
                 .to.eventually.be.rejected;
         });
 
         it("should return a fulfilled promise", function () {
-            const remove = sut(uri, token, "Projects");
+            const sut = factory(config);
 
-            return expect(remove.remove(id))
+            return expect(sut.remove(id))
                 .to.eventually.be.fulfilled;
         });
     });

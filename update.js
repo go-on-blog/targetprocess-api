@@ -4,105 +4,96 @@
 (function () {
     "use strict";
 
-    // See https://dev.targetprocess.com/docs/operations
-    const resources = [
-        "Assignables",
-        // "AssignedEfforts",
-        "Assignments",
-        "Attachments",
-        "Bugs",
-        "Builds",
-        "Comments",
-        "Companies",
-        "CustomActivities",
-        "CustomFields",
-        "CustomRules",
-        "EntityStates",
-        // "EntityTypes",
-        "Epics",
-        "Features",
-        "Generals",
-        "GeneralFollowers",
-        "GeneralUsers",
-        "GlobalSettings",
-        "Impediments",
-        "InboundAssignables",
-        "Iterations",
-        "Messages",
-        "MessageUids",
-        "Milestones",
-        "OutboundAssignables",
-        "Priorities",
-        "Processes",
-        "Programs",
-        "Projects",
-        "ProjectAllocations",
-        "ProjectMembers",
-        "Relations",
-        // "RelationTypes",
-        "Releases",
-        "ReleaseProjects",
-        "Requests",
-        "Requesters",
-        "RequestTypes",
-        "Revisions",
-        "RevisionFiles",
-        "Roles",
-        "RoleEfforts",
-        "RoleEntityTypes",
-        "Severities",
-        "Tags",
-        "Tasks",
-        "Teams",
-        "TeamAssignments",
-        "TeamIterations",
-        "TeamMembers",
-        "TeamProjects",
-        "TeamProjectAllocations",
-        // "Terms",
-        "TestCases",
-        "TestCaseRuns",
-        "TestPlans",
-        "TestPlanRuns",
-        // "TestRunItemHierarchyLinks",
-        "TestSteps",
-        "TestStepRuns",
-        "Times",
-        "Users",
-        "UserProjectAllocations",
-        "UserStories",
-        "Workflows"
-    ];
+    const stampit = require("@stamp/it");
+    const configure = require("./configure");
+    const operation = require("./operation");
 
-    function factory(uri, token, resource) {
-        if (!resources.includes(resource)) {
-            throw new Error(`"${resource}" is not available for update.`);
-        }
-
-        const options = {
-            method: "POST",
-            uri: `${uri}/${resource}/`,
-            qs: {token},
-            json: true
-        };
-
-        function update(obj) {
-            const request = require("request-promise-native");
-
-            if (!obj.hasOwnProperty("Id")) {
-                const when = require("when");
-                return when.reject(new Error("The resource Id must be provided in order to perform this update"));
+    module.exports = stampit(configure, operation, {
+        statics: {
+            // See https://dev.targetprocess.com/docs/operations
+            resources: [
+                "Assignables",
+                // "AssignedEfforts",
+                "Assignments",
+                "Attachments",
+                "Bugs",
+                "Builds",
+                "Comments",
+                "Companies",
+                "CustomActivities",
+                "CustomFields",
+                "CustomRules",
+                "EntityStates",
+                // "EntityTypes",
+                "Epics",
+                "Features",
+                "Generals",
+                "GeneralFollowers",
+                "GeneralUsers",
+                "GlobalSettings",
+                "Impediments",
+                "InboundAssignables",
+                "Iterations",
+                "Messages",
+                "MessageUids",
+                "Milestones",
+                "OutboundAssignables",
+                "Priorities",
+                "Processes",
+                "Programs",
+                "Projects",
+                "ProjectAllocations",
+                "ProjectMembers",
+                "Relations",
+                // "RelationTypes",
+                "Releases",
+                "ReleaseProjects",
+                "Requests",
+                "Requesters",
+                "RequestTypes",
+                "Revisions",
+                "RevisionFiles",
+                "Roles",
+                "RoleEfforts",
+                "RoleEntityTypes",
+                "Severities",
+                "Tags",
+                "Tasks",
+                "Teams",
+                "TeamAssignments",
+                "TeamIterations",
+                "TeamMembers",
+                "TeamProjects",
+                "TeamProjectAllocations",
+                // "Terms",
+                "TestCases",
+                "TestCaseRuns",
+                "TestPlans",
+                "TestPlanRuns",
+                // "TestRunItemHierarchyLinks",
+                "TestSteps",
+                "TestStepRuns",
+                "Times",
+                "Users",
+                "UserProjectAllocations",
+                "UserStories",
+                "Workflows"
+            ]
+        },
+        deepProps: {
+            options: {
+                method: "POST"
             }
+        },
+        methods: {
+            update(obj) {
+                if (!obj.hasOwnProperty("Id")) {
+                    return Promise.reject(new Error("The resource Id must be provided in order to perform this update"));
+                }
 
-            options.body = obj;
-            return request(options);
+                this.options.body = obj;
+                return this.request(this.options);
+            }
         }
-
-        return {
-            update
-        };
-    }
-
-    module.exports = factory;
-    module.exports.resources = resources;
+    });
 }());

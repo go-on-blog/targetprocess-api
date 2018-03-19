@@ -44,7 +44,6 @@ describe("index", function () {
 
             expect(index).to.be.an("object");
             api.forEach(function (name) {
-                expect(index).to.have.own.property(name);
                 expect(index[name]).to.be.a("function");
             });
         });

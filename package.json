@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "lint": "jslint --edition=latest --fudge \"src/**/*.js\"",
+    "lint": "jslint --edition=latest --fudge \"*.js\"",
     "lint:test": "jslint --edition=latest --fudge \"test/**/*.js\"",
     "test": "npm run lint:test && npm run lint && mocha test --recursive"
   },
@@ -18,10 +18,10 @@
     "url": "https://github.com/go-on-blog/targetprocess-api/issues"
   },
   "dependencies": {
+    "@stamp/it": "^1.0.3",
     "mout": "^1.1.0",
     "request": "^2.83.0",
-    "request-promise-native": "^1.0.5",
-    "when": "^3.7.8"
+    "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
     "chai": "latest",

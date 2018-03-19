@@ -5,9 +5,9 @@ const {after, describe, it} = require("mocha");
 const chai = require("chai");
 const expect = chai.expect;
 const chaiAsPromised = require("chai-as-promised");
-const sut = require("../create");
-const {domain, token} = require("../config/credentials");
-const uri = `https://${domain}/api/v1`;
+const factory = require("../create");
+const credentials = require("../config/credentials");
+const config = Object.assign({resource: "Projects"}, credentials);
 
 chai.use(chaiAsPromised);
 
@@ -17,21 +17,20 @@ describe("create", function () {
 
     describe("factory", function () {
         it("should throw an error when the resource is not allowed for creation", function () {
-            function factory() {
-                sut(uri, token, "not allowed");
+            function constructor() {
+                factory(Object.assign({resource: "not allowed"}, credentials));
             }
 
-            return expect(factory).to.throw(Error);
+            return expect(constructor).to.throw(Error);
         });
 
         it("should return an object having the expected API", function () {
-            const create = sut(uri, token, "Projects");
+            const sut = factory(config);
             const api = ["create"];
 
-            expect(create).to.be.an("object");
+            expect(sut).to.be.an("object");
             api.forEach(function (name) {
-                expect(create).to.have.own.property(name);
-                expect(create[name]).to.be.a("function");
+                expect(sut[name]).to.be.a("function");
             });
         });
     });
@@ -40,12 +39,12 @@ describe("create", function () {
 
     describe("create", function () {
         it("should return an object having an id", function () {
-            const create = sut(uri, token, "Projects");
+            const sut = factory(config);
             const obj = {
                 "Name": Math.random().toString(36).replace(/[^a-z]+/g, ""),
                 "Abbreviation": Math.random().toString(36).replace(/[^a-z]+/g, "").substr(0, 3)
             };
-            const promise = create.create(obj).then(function (item) {
+            const promise = sut.create(obj).then(function (item) {
                 id = item.Id;
                 return item;
             });
@@ -57,9 +56,7 @@ describe("create", function () {
     });
 
     after(function () {
-        const factory = require("../remove");
-        const remove = factory(uri, token, "Projects");
-
+        const remove = require("../remove")(config);
         return remove.remove(id);
     });
 });
