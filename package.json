@@ -6,6 +6,7 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
     "lint": "jslint --edition=latest --fudge \"*.js\"",
     "lint:test": "jslint --edition=latest --fudge \"test/**/*.js\"",
     "test": "npm run lint:test && npm run lint && mocha test --recursive"
@@ -26,6 +27,8 @@
   "devDependencies": {
     "chai": "latest",
     "chai-as-promised": "latest",
+    "codecov": "latest",
+    "istanbul": "latest",
     "jslint": "latest",
     "mocha": "latest",
     "sinon": "latest"
