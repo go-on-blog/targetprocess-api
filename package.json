@@ -1,6 +1,6 @@
 {
   "name": "targetprocess-api",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Targetprocess API wrapper",
   "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
   "license": "MIT",

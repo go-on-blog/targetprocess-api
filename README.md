@@ -1,6 +1,7 @@
 # targetprocess-api
 
 [![Build Status](https://travis-ci.org/go-on-blog/targetprocess-api.svg?branch=master)](https://travis-ci.org/go-on-blog/targetprocess-api)
+[![Coverage](https://codecov.io/gh/go-on-blog/targetprocess-api/branch/master/graph/badge.svg)](https://codecov.io/gh/go-on-blog/targetprocess-api)
 
 ## Sample usage
 
