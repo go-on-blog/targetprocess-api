@@ -1,19 +1,20 @@
 /*jslint
     es6, node, this
 */
-const {after, describe, it} = require("mocha");
-const chai = require("chai");
-const expect = chai.expect;
-const chaiAsPromised = require("chai-as-promised");
-const factory = require("../create");
-const credentials = require("../config/credentials");
-const config = Object.assign({resource: "Projects"}, credentials);
+"use strict";
 
-chai.use(chaiAsPromised);
+const {describe, it} = require("mocha");
 
 describe("create", function () {
-    "use strict";
-    var id;
+    const chai = require("chai");
+    const expect = chai.expect;
+    const chaiAsPromised = require("chai-as-promised");
+    const sinon = require("sinon");
+    const factory = require("../create");
+    const credentials = require("../config/credentials");
+    const config = Object.assign({resource: "Projects"}, credentials);
+
+    chai.use(chaiAsPromised);
 
     describe("factory", function () {
         it("should throw an error when the resource is not allowed for creation", function () {
@@ -35,28 +36,27 @@ describe("create", function () {
         });
     });
 
-    this.timeout(5000);
-
     describe("create", function () {
         it("should return an object having an id", function () {
-            const sut = factory(config);
             const obj = {
-                "Name": Math.random().toString(36).replace(/[^a-z]+/g, ""),
-                "Abbreviation": Math.random().toString(36).replace(/[^a-z]+/g, "").substr(0, 3)
+                "Name": "whatever",
+                "Abbreviation": "WE"
             };
-            const promise = sut.create(obj).then(function (item) {
-                id = item.Id;
-                return item;
-            });
+            const options = {
+                method: "POST",
+                uri: `https://${credentials.domain}/api/v1/Projects/`,
+                qs: {token: credentials.token},
+                body: obj,
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
 
-            return expect(promise)
+            request.withArgs(options).returns(Promise.resolve({Id: 1}));
+
+            return expect(sut.create(obj))
                 .to.eventually.be.an("object")
                 .and.to.eventually.have.own.property("Id");
         });
-    });
-
-    after(function () {
-        const remove = require("../remove")(config);
-        return remove.remove(id);
     });
 });

@@ -1,13 +1,14 @@
 /*jslint
     es6, node
 */
+"use strict";
+
 const {describe, it} = require("mocha");
-const {expect} = require("chai");
-const sut = require("../index");
-const {domain, token} = require("../config/credentials");
 
 describe("index", function () {
-    "use strict";
+    const {expect} = require("chai");
+    const sut = require("../index");
+    const credentials = require("../config/credentials");
 
     describe("factory", function () {
         it("should throw an error when options are missing", function () {
@@ -39,7 +40,7 @@ describe("index", function () {
         });
 
         it("should return an object having the expected API", function () {
-            const index = sut({domain, token});
+            const index = sut(credentials);
             const api = ["create", "retrieve", "update", "remove"];
 
             expect(index).to.be.an("object");

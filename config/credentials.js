@@ -1,7 +1,5 @@
-// Credentials for testing purpose only.
-// To get a security token, request the Authentication REST service
-// using: ${uri}/Authentication
+// Fake credentials for testing purpose only.
 module.exports = {
-    "domain": "goon.tpondemand.com",
+    "domain": "dummy.tpondemand.com",
     "token": "MTpGMjRERDMxODUzNDk1NjdFOTQ0NEY4NkFFOEJCMjkzMw=="
 };

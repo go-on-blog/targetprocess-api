@@ -1,18 +1,20 @@
 /*jslint
     es6, node, this
 */
-const {describe, it} = require("mocha");
-const chai = require("chai");
-const expect = chai.expect;
-const chaiAsPromised = require("chai-as-promised");
-const factory = require("../retrieve");
-const credentials = require("../config/credentials");
-const config = Object.assign({resource: "Projects"}, credentials);
+"use strict";
 
-chai.use(chaiAsPromised);
+const {describe, it} = require("mocha");
 
 describe("retrieve", function () {
-    "use strict";
+    const chai = require("chai");
+    const expect = chai.expect;
+    const chaiAsPromised = require("chai-as-promised");
+    const sinon = require("sinon");
+    const factory = require("../retrieve");
+    const credentials = require("../config/credentials");
+    const config = Object.assign({resource: "UserStories"}, credentials);
+
+    chai.use(chaiAsPromised);
 
     describe("factory", function () {
         it("should throw an error when the resource is not allowed for retrieval", function () {
@@ -34,25 +36,39 @@ describe("retrieve", function () {
         });
     });
 
-    this.timeout(10000);
-
     describe("get", function () {
         it("should return an object array corresponding to the specified resource", function () {
-            const resources = [];
+            const options = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {token: credentials.token},
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
 
-            function get(resource) {
-                const sut = factory(Object.assign({resource}, credentials));
-                return expect(sut.get()).to.eventually.be.an("array");
-            }
+            request.withArgs(options).returns(Promise.resolve({Items: [1, 2, 3, 4]}));
 
-            return Promise.all(resources.map(get));
+            return expect(sut.get()).to.eventually.be.an("array");
         });
     });
 
     describe("take", function () {
         it("should return an array containing the specified item count", function () {
-            const sut = factory(Object.assign({resource: "Features"}, credentials));
             const LIMIT = 2;
+            const options = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    take: LIMIT
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options).returns(Promise.resolve({Items: [1, 2]}));
 
             return expect(sut.take(LIMIT).get())
                 .to.eventually.be.an("array")
@@ -62,8 +78,31 @@ describe("retrieve", function () {
 
     describe("skip", function () {
         it("should return items different from the previous page", function () {
-            const sut = factory(Object.assign({resource: "UserStories"}, credentials));
             const LIMIT = 2;
+            const options1 = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    take: LIMIT
+                },
+                json: true
+            };
+            const options2 = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    take: LIMIT,
+                    skip: LIMIT
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options1).returns(Promise.resolve({Items: [1, 2]}));
+            request.withArgs(options2).returns(Promise.resolve({Items: [3, 4]}));
 
             return expect(sut.take(LIMIT).get().then(function (first) {
                 return sut.take(LIMIT).skip(LIMIT).get().then(function (second) {
@@ -75,17 +114,28 @@ describe("retrieve", function () {
     });
 
     describe("where", function () {
-        it("should return a rejected promise when the expression contains a syntax error", function () {
-            const sut = factory(Object.assign({resource: "UserStories"}, credentials));
-            const syntaxError = "EntityState.Name 'In progress'";
-
-            return expect(sut.where(syntaxError).get())
-                .to.eventually.be.rejected;
-        });
-
         it("should return a subset of resources corresponding to the specified condition", function () {
-            const sut = factory(config);
-            const condition = "Process.Name eq 'Scrum'";
+            const condition = "Project.Id eq 42";
+            const options1 = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {token: credentials.token},
+                json: true
+            };
+            const options2 = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    where: condition
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options1).returns(Promise.resolve({Items: [1, 2, 3, 4]}));
+            request.withArgs(options2).returns(Promise.resolve({Items: [2, 4]}));
 
             return expect(sut.get().then(function (set) {
                 return sut.where(condition).get().then(function (subset) {
@@ -111,8 +161,25 @@ describe("retrieve", function () {
 
     describe("orderby", function () {
         it("should return an object array sorted by the specified attribute in ascending order", function () {
-            const sut = factory(Object.assign({resource: "Bugs"}, credentials));
             const attribute = "Name";
+            const options = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    orderby: attribute
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options).returns(Promise.resolve({Items: [
+                {Id: 4, Name: "a"},
+                {Id: 2, Name: "b"},
+                {Id: 1, Name: "c"},
+                {Id: 3, Name: "d"}
+            ]}));
 
             return expect(sut.orderby(attribute).get().then(function (items) {
                 const sort = require("mout/array/sort");
@@ -126,8 +193,25 @@ describe("retrieve", function () {
 
     describe("orderbydesc", function () {
         it("should return an object array sorted by the specified attribute in descending order", function () {
-            const sut = factory(Object.assign({resource: "Bugs"}, credentials));
             const attribute = "Name";
+            const options = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    orderbydesc: attribute
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options).returns(Promise.resolve({Items: [
+                {Id: 3, Name: "d"},
+                {Id: 1, Name: "c"},
+                {Id: 2, Name: "b"},
+                {Id: 4, Name: "a"}
+            ]}));
 
             return expect(sut.orderbydesc(attribute).get().then(function (items) {
                 const sort = require("mout/array/sort");
@@ -150,9 +234,26 @@ describe("retrieve", function () {
         });
 
         it("should return objects with the specified attributes only", function () {
-            const sut = factory(config);
-            const attributes = ["CreateDate", "Abbreviation"];
+            const attributes = ["CreateDate", "Progress"];
             const alwaysPresent = ["ResourceType", "Id"];
+            const options = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    include: "[CreateDate,Progress]"
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options).returns(Promise.resolve({Items: [
+                {ResourceType: "UserStory", Id: 1, CreateDate: null, Progress: 0},
+                {ResourceType: "UserStory", Id: 2, CreateDate: null, Progress: 0},
+                {ResourceType: "UserStory", Id: 3, CreateDate: null, Progress: 0},
+                {ResourceType: "UserStory", Id: 4, CreateDate: null, Progress: 0}
+            ]}));
 
             return expect(sut.pick(attributes).get().then(function (items) {
                 function hasTheSpecifiedAttributesOnly(item) {
@@ -178,8 +279,25 @@ describe("retrieve", function () {
         });
 
         it("should return objects without the specified attributes", function () {
-            const sut = factory(config);
-            const attributes = ["CreateDate", "Abbreviation"];
+            const attributes = ["CreateDate", "Progress"];
+            const options = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    exclude: "[CreateDate,Progress]"
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options).returns(Promise.resolve({Items: [
+                {ResourceType: "UserStory", Id: 1, Name: "c", EndDate: null},
+                {ResourceType: "UserStory", Id: 2, Name: "b", EndDate: null},
+                {ResourceType: "UserStory", Id: 3, Name: "d", EndDate: null},
+                {ResourceType: "UserStory", Id: 4, Name: "a", EndDate: null}
+            ]}));
 
             return expect(sut.omit(attributes).get().then(function (items) {
                 function hasNoneOfTheSpecifiedAttributes(item) {
@@ -203,8 +321,23 @@ describe("retrieve", function () {
         });
 
         it("should return objects with the specified calculations appended", function () {
-            const sut = factory(config);
             const calculations = ["UserStories-Effort-Avg"];
+            const options = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    append: "[UserStories-Effort-Avg]"
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options).returns(Promise.resolve({Items: [
+                {ResourceType: "UserStory", Id: 1, "UserStories-Effort-Avg": 21, EndDate: null},
+                {ResourceType: "UserStory", Id: 2, "UserStories-Effort-Avg": 42, EndDate: null}
+            ]}));
 
             return expect(sut.append(calculations).get().then(function (items) {
                 function hasTheSpecifiedCalculations(item) {

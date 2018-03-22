@@ -1,19 +1,20 @@
 /*jslint
     es6, node, this
 */
-const {before, describe, it} = require("mocha");
-const chai = require("chai");
-const expect = chai.expect;
-const chaiAsPromised = require("chai-as-promised");
-const factory = require("../remove");
-const credentials = require("../config/credentials");
-const config = Object.assign({resource: "Projects"}, credentials);
+"use strict";
 
-chai.use(chaiAsPromised);
+const {describe, it} = require("mocha");
 
 describe("remove", function () {
-    "use strict";
-    var id;
+    const chai = require("chai");
+    const expect = chai.expect;
+    const chaiAsPromised = require("chai-as-promised");
+    const sinon = require("sinon");
+    const factory = require("../remove");
+    const credentials = require("../config/credentials");
+    const config = Object.assign({resource: "Projects"}, credentials);
+
+    chai.use(chaiAsPromised);
 
     describe("factory", function () {
         it("should throw an error when the resource is not allowed for deletion", function () {
@@ -35,17 +36,6 @@ describe("remove", function () {
         });
     });
 
-    this.timeout(5000);
-
-    before(function () {
-        const create = require("../create")(config);
-        const name = Math.random().toString(36).replace(/[^a-z]+/g, "");
-
-        return create.create({"Name": name}).then(function (item) {
-            id = item.Id;
-        });
-    });
-
     describe("remove", function () {
         it("should return a rejected promise when the Id is missing", function () {
             const sut = factory(config);
@@ -55,7 +45,17 @@ describe("remove", function () {
         });
 
         it("should return a fulfilled promise", function () {
-            const sut = factory(config);
+            const id = 42;
+            const options = {
+                method: "DELETE",
+                uri: `https://${credentials.domain}/api/v1/Projects/${id}`,
+                qs: {token: credentials.token},
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.withArgs(options).returns(Promise.resolve({statusCode: 200}));
 
             return expect(sut.remove(id))
                 .to.eventually.be.fulfilled;
