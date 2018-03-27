@@ -88,10 +88,24 @@
         methods: {
             remove(id) {
                 if (!id) {
-                    return Promise.reject(new Error("The id must be provided in order to perform this deletion"));
+                    return Promise.reject(new Error("The id must be provided in order to perform this removal"));
                 }
 
                 this.options.uri = this.options.uri.concat(id);
+                return this.request(this.options);
+            },
+
+            batchRemove(batch) {
+                if (!Array.isArray(batch)) {
+                    return Promise.reject(new Error("The argument must be an array to perform a batch removal"));
+                }
+
+                if (batch.length === 1) {
+                    return this.remove(batch[0]);
+                }
+
+                this.options.body = batch.map((id) => ({Id: id}));
+                this.options.uri = this.options.uri.concat("bulk");
                 return this.request(this.options);
             }
         }

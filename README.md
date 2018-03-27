@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/go-on-blog/targetprocess-api.svg?branch=master)](https://travis-ci.org/go-on-blog/targetprocess-api)
 [![Coverage](https://codecov.io/gh/go-on-blog/targetprocess-api/branch/master/graph/badge.svg)](https://codecov.io/gh/go-on-blog/targetprocess-api)
+[![Known Vulnerabilities](https://snyk.io/test/github/go-on-blog/targetprocess-api/badge.svg?targetFile=package.json)](https://snyk.io/test/github/go-on-blog/targetprocess-api?targetFile=package.json)
 
 ## Sample usage
 
