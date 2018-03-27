@@ -55,9 +55,37 @@ describe("remove", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({statusCode: 200}));
+            request.rejects();
+            request.withArgs(options).resolves({statusCode: 200});
 
             return expect(sut.remove(id))
+                .to.eventually.be.fulfilled;
+        });
+
+        it("should be idempotent", function () {
+            const options1 = {
+                method: "DELETE",
+                uri: `https://${credentials.domain}/api/v1/UserStories/bulk`,
+                body: [{Id: 12}, {Id: 34}],
+                qs: {token: credentials.token},
+                json: true
+            };
+            const options2 = {
+                method: "DELETE",
+                uri: `https://${credentials.domain}/api/v1/UserStories/56`,
+                qs: {token: credentials.token},
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.rejects();
+            request.withArgs(options1).resolves({statusCode: 200});
+            request.withArgs(options2).resolves({statusCode: 200});
+
+            return expect(sut.batchRemove([12, 34]).then(function () {
+                return sut.remove(56);
+            }))
                 .to.eventually.be.fulfilled;
         });
     });
@@ -89,9 +117,36 @@ describe("remove", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({statusCode: 200}));
+            request.withArgs(options).resolves({statusCode: 200});
 
             return expect(sut.batchRemove([12, 34]))
+                .to.eventually.be.fulfilled;
+        });
+
+        it("should be idempotent", function () {
+            const options1 = {
+                method: "DELETE",
+                uri: `https://${credentials.domain}/api/v1/UserStories/56`,
+                qs: {token: credentials.token},
+                json: true
+            };
+            const options2 = {
+                method: "DELETE",
+                uri: `https://${credentials.domain}/api/v1/UserStories/bulk`,
+                body: [{Id: 12}, {Id: 34}],
+                qs: {token: credentials.token},
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.rejects();
+            request.withArgs(options1).resolves({statusCode: 200});
+            request.withArgs(options2).resolves({statusCode: 200});
+
+            return expect(sut.remove(56).then(function () {
+                return sut.batchRemove([12, 34]);
+            }))
                 .to.eventually.be.fulfilled;
         });
     });

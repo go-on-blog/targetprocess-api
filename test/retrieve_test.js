@@ -47,9 +47,39 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({Items: [1, 2, 3, 4]}));
+            request.withArgs(options).resolves({Items: [1, 2, 3, 4]});
 
             return expect(sut.get()).to.eventually.be.an("array");
+        });
+
+        it("should be idempotent", function () {
+            const options1 = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {
+                    token: credentials.token,
+                    skip: 10
+                },
+                json: true
+            };
+            const options2 = {
+                method: "GET",
+                uri: `https://${credentials.domain}/api/v1/UserStories/`,
+                qs: {token: credentials.token},
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.rejects();
+            request.withArgs(options1).resolves({Items: [11, 12]});
+            request.withArgs(options2).resolves({Items: [1, 2]});
+
+            return expect(sut.skip(10).get().then(function () {
+                return sut.get();
+            }))
+                .to.eventually.eql([1, 2]);
+
         });
     });
 
@@ -68,7 +98,7 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({Items: [1, 2]}));
+            request.withArgs(options).resolves({Items: [1, 2]});
 
             return expect(sut.take(LIMIT).get())
                 .to.eventually.be.an("array")
@@ -101,8 +131,8 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options1).returns(Promise.resolve({Items: [1, 2]}));
-            request.withArgs(options2).returns(Promise.resolve({Items: [3, 4]}));
+            request.withArgs(options1).resolves({Items: [1, 2]});
+            request.withArgs(options2).resolves({Items: [3, 4]});
 
             return expect(sut.take(LIMIT).get().then(function (first) {
                 return sut.take(LIMIT).skip(LIMIT).get().then(function (second) {
@@ -134,8 +164,8 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options1).returns(Promise.resolve({Items: [1, 2, 3, 4]}));
-            request.withArgs(options2).returns(Promise.resolve({Items: [2, 4]}));
+            request.withArgs(options1).resolves({Items: [1, 2, 3, 4]});
+            request.withArgs(options2).resolves({Items: [2, 4]});
 
             return expect(sut.get().then(function (set) {
                 return sut.where(condition).get().then(function (subset) {
@@ -174,12 +204,12 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({Items: [
+            request.withArgs(options).resolves({Items: [
                 {Id: 4, Name: "a"},
                 {Id: 2, Name: "b"},
                 {Id: 1, Name: "c"},
                 {Id: 3, Name: "d"}
-            ]}));
+            ]});
 
             return expect(sut.orderby(attribute).get().then(function (items) {
                 const sort = require("mout/array/sort");
@@ -206,12 +236,12 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({Items: [
+            request.withArgs(options).resolves({Items: [
                 {Id: 3, Name: "d"},
                 {Id: 1, Name: "c"},
                 {Id: 2, Name: "b"},
                 {Id: 4, Name: "a"}
-            ]}));
+            ]});
 
             return expect(sut.orderbydesc(attribute).get().then(function (items) {
                 const sort = require("mout/array/sort");
@@ -248,12 +278,12 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({Items: [
+            request.withArgs(options).resolves({Items: [
                 {ResourceType: "UserStory", Id: 1, CreateDate: null, Progress: 0},
                 {ResourceType: "UserStory", Id: 2, CreateDate: null, Progress: 0},
                 {ResourceType: "UserStory", Id: 3, CreateDate: null, Progress: 0},
                 {ResourceType: "UserStory", Id: 4, CreateDate: null, Progress: 0}
-            ]}));
+            ]});
 
             return expect(sut.pick(attributes).get().then(function (items) {
                 function hasTheSpecifiedAttributesOnly(item) {
@@ -292,12 +322,12 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({Items: [
+            request.withArgs(options).resolves({Items: [
                 {ResourceType: "UserStory", Id: 1, Name: "c", EndDate: null},
                 {ResourceType: "UserStory", Id: 2, Name: "b", EndDate: null},
                 {ResourceType: "UserStory", Id: 3, Name: "d", EndDate: null},
                 {ResourceType: "UserStory", Id: 4, Name: "a", EndDate: null}
-            ]}));
+            ]});
 
             return expect(sut.omit(attributes).get().then(function (items) {
                 function hasNoneOfTheSpecifiedAttributes(item) {
@@ -334,10 +364,10 @@ describe("retrieve", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({Items: [
+            request.withArgs(options).resolves({Items: [
                 {ResourceType: "UserStory", Id: 1, "UserStories-Effort-Avg": 21, EndDate: null},
                 {ResourceType: "UserStory", Id: 2, "UserStories-Effort-Avg": 42, EndDate: null}
-            ]}));
+            ]});
 
             return expect(sut.append(calculations).get().then(function (items) {
                 function hasTheSpecifiedCalculations(item) {

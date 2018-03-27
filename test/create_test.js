@@ -52,11 +52,44 @@ describe("create", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve({Id: 1}));
+            request.withArgs(options).resolves({Id: 1});
 
             return expect(sut.create(obj))
                 .to.eventually.be.an("object")
                 .and.to.eventually.have.own.property("Id");
+        });
+
+        it("should be idempotent", function () {
+            const options1 = {
+                method: "POST",
+                uri: `https://${credentials.domain}/api/v1/Projects/`,
+                qs: {token: credentials.token},
+                body: {
+                    Name: "x",
+                    Abbreviation: "ABC"
+                },
+                json: true
+            };
+            const options2 = {
+                method: "POST",
+                uri: `https://${credentials.domain}/api/v1/Projects/`,
+                qs: {token: credentials.token},
+                body: {
+                    Name: "y"
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.rejects();
+            request.withArgs(options1).resolves({Id: 128});
+            request.withArgs(options2).resolves({Id: 129});
+
+            return expect(sut.create(options1.body).then(function () {
+                return sut.create(options2.body);
+            }))
+                .to.eventually.be.fulfilled;
         });
     });
 });

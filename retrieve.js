@@ -82,7 +82,18 @@
         },
         methods: {
             get() {
+                const options = this.options;
+
                 function normalize(response) {
+                    delete options.qs.take;
+                    delete options.qs.skip;
+                    delete options.qs.where;
+                    delete options.qs.orderby;
+                    delete options.qs.orderbydesc;
+                    delete options.qs.include;
+                    delete options.qs.exclude;
+                    delete options.qs.append;
+
                     return response.Items;
                 }
 

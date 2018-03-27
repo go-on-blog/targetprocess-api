@@ -60,11 +60,47 @@ describe("update", function () {
             const request = sinon.stub();
             const sut = factory(Object.assign({request}, config));
 
-            request.withArgs(options).returns(Promise.resolve(obj));
+            request.withArgs(options).resolves(obj);
 
             return expect(sut.update(obj))
                 .to.eventually.be.an("object")
                 .and.to.include(obj);
+        });
+
+        it("should be idempotent", function () {
+            const options1 = {
+                method: "POST",
+                uri: `https://${credentials.domain}/api/v1/Projects/`,
+                qs: {token: credentials.token},
+                body: {
+                    Id: 128,
+                    Name: "x",
+                    Abbreviation: "ABC"
+                },
+                json: true
+            };
+            const options2 = {
+                method: "POST",
+                uri: `https://${credentials.domain}/api/v1/Projects/`,
+                qs: {token: credentials.token},
+                body: {
+                    Id: 129,
+                    Name: "y"
+                },
+                json: true
+            };
+            const request = sinon.stub();
+            const sut = factory(Object.assign({request}, config));
+
+            request.rejects();
+            request.withArgs(options1).resolves(options1.body);
+            request.withArgs(options2).resolves(options2.body);
+
+            return expect(sut.update(options1.body).then(function () {
+                return sut.update(options2.body);
+            }))
+                .to.eventually.be.an("object")
+                .and.to.include(options2.body);
         });
     });
 });

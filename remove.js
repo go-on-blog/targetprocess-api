@@ -91,8 +91,11 @@
                     return Promise.reject(new Error("The id must be provided in order to perform this removal"));
                 }
 
-                this.options.uri = this.options.uri.concat(id);
-                return this.request(this.options);
+                const options = Object.assign({}, this.options, {
+                    uri: this.options.uri.concat(id)
+                });
+
+                return this.request(options);
             },
 
             batchRemove(batch) {
@@ -104,9 +107,12 @@
                     return this.remove(batch[0]);
                 }
 
-                this.options.body = batch.map((id) => ({Id: id}));
-                this.options.uri = this.options.uri.concat("bulk");
-                return this.request(this.options);
+                const options = Object.assign({}, this.options, {
+                    body: batch.map((id) => ({Id: id})),
+                    uri: this.options.uri.concat("bulk")
+                });
+
+                return this.request(options);
             }
         }
     });
