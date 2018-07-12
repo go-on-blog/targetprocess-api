@@ -89,6 +89,23 @@
             create(obj) {
                 this.options.body = obj;
                 return this.request(this.options);
+            },
+
+            batchCreate(batch) {
+                if (!Array.isArray(batch)) {
+                    return Promise.reject(new Error("The argument must be an array to perform a batch creation"));
+                }
+
+                if (batch.length === 1) {
+                    return this.create(batch[0]);
+                }
+
+                const options = Object.assign({}, this.options, {
+                    body: batch,
+                    uri: this.options.uri.concat("bulk")
+                });
+
+                return this.request(options);
             }
         }
     });

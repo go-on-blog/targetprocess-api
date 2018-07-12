@@ -1,6 +1,6 @@
 {
   "name": "targetprocess-api",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Targetprocess API wrapper",
   "author": "Guillaume Oriol <guillaume@go-on.blog> (https://github.com/go-on-blog)",
   "license": "MIT",
@@ -21,7 +21,7 @@
   "dependencies": {
     "@stamp/it": "^1.0.3",
     "mout": "^1.1.0",
-    "request": "^2.83.0",
+    "request": "^2.87.0",
     "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
@@ -30,7 +30,7 @@
     "codecov": "latest",
     "istanbul": "latest",
     "jslint": "latest",
-    "mocha": "latest",
+    "mocha": "^5.2.0",
     "sinon": "latest"
   },
   "engines": {
