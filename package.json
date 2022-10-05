@@ -9,7 +9,9 @@
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
     "lint": "jslint --edition=latest --fudge \"*.js\"",
     "lint:test": "jslint --edition=latest --fudge \"test/**/*.js\"",
-    "test": "npm run lint:test && npm run lint && mocha test --recursive"
+    "test": "npm run lint:test && npm run lint && mocha test --recursive",
+    "prepare": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -20,9 +22,10 @@
   },
   "dependencies": {
     "@stamp/it": "^1.0.3",
-    "mout": "^1.1.0",
-    "request": "^2.87.0",
-    "request-promise-native": "^1.0.5"
+    "mout": "^1.2.4",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "chai": "latest",
@@ -39,5 +42,6 @@
   "keywords": [
     "targetprocess",
     "api"
-  ]
+  ],
+  "snyk": true
 }
